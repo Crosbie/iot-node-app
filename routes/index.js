@@ -10,16 +10,7 @@ var minCooling = 18;
 var maxCooling = 22;
 
 var coolingData = {};
-var prodData = { '::1':
-[ { temp: 280, rpm: 90, OK: true },
-  { temp: 270, rpm: 80, OK: false },
-  { temp: 273, rpm: 88, OK: false },
-  { temp: 278, rpm: 88, OK: true },
-  { temp: 200, rpm: 90, OK: false },
-  { temp: 200, rpm: 90, OK: false },
-  { temp: 200, rpm: 90, OK: false },
-  { temp: 200, rpm: 90, OK: false },
-  { temp: 200, rpm: 90, OK: false } ] }
+var prodData = {}
 
 
 function evalutateProduction(ip,data,cb){
