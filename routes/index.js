@@ -9,14 +9,28 @@ var maxRPM = 92;
 var minCooling = 18;
 var maxCooling = 22;
 
+var coolingData = {};
+var prodData = { '::1':
+[ { temp: 280, rpm: 90, OK: true },
+  { temp: 270, rpm: 80, OK: false },
+  { temp: 273, rpm: 88, OK: false },
+  { temp: 278, rpm: 88, OK: true },
+  { temp: 200, rpm: 90, OK: false },
+  { temp: 200, rpm: 90, OK: false },
+  { temp: 200, rpm: 90, OK: false },
+  { temp: 200, rpm: 90, OK: false },
+  { temp: 200, rpm: 90, OK: false } ] }
 
 
-function evalutateProduction(data,cb){
+function evalutateProduction(ip,data,cb){
   data = decodeURI(data);
+  console.log('data',data);
   var payload = JSON.parse(data);
 
   var temp = payload.temperature || 0;
   var rpm = payload.rpm || 0;
+
+  storeProdData(ip,{temp:temp,rpm:rpm});
 
   if(tempOK(temp) && rpmOK(rpm)){
     // return OK
@@ -26,10 +40,12 @@ function evalutateProduction(data,cb){
   }
 }
 
-function evalutateCooling(data,cb){
+function evalutateCooling(ip,data,cb){
   data = decodeURI(data);
   var payload = JSON.parse(data);
   var cooling = payload.cooling || 0;
+
+  storeCoolingData(ip,cooling);
 
   if(coolingOK(cooling)){
     // return OK
@@ -41,12 +57,18 @@ function evalutateCooling(data,cb){
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  res.render('dashboard', {
+    title:'IOT App Dashboard',
+    pdata:prodData,
+    cdata:coolingData
+  });
 });
 
 router.get('/production/:payload', function(req, res, next) {
   var payload = req.params.payload;
-  evalutateProduction(payload,function(err,data){
+  var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
+  evalutateProduction(ip,payload,function(err,data){
     res.end(data);
   })
 });
@@ -54,7 +76,9 @@ router.get('/production/:payload', function(req, res, next) {
 
 router.get('/cooling/:payload', function(req, res, next) {
   var payload = req.params.payload;
-  evalutateCooling(payload,function(err,data){
+  var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
+  evalutateCooling(ip,payload,function(err,data){
     res.end(data);
   })
 });
@@ -81,6 +105,27 @@ function coolingOK(cooling){
     return true;
   } else{
     return false;
+  }
+}
+
+function storeProdData(ip,data){
+  data.OK = (tempOK(data.temp) && rpmOK(data.rpm));
+  console.log('Storing Production Data');
+  console.log(ip,data); 
+
+  if(prodData[ip]){
+    prodData[ip].push(data);
+  } else {
+    prodData[ip] = [data];
+  }
+}
+
+function storeCoolingData(ip,cooling){
+  var OK = coolingOK(cooling);
+  if(coolingData[ip]){
+    coolingData[ip].push({cooling:cooling,OK:OK});
+  } else {
+    coolingData[ip] = [{cooling:cooling,OK:OK}];
   }
 }
 

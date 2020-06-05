@@ -1,0 +1,36 @@
+<h1>{{title}}</h1>
+<p>Welcome to {{title}}</p>
+
+<hr>
+
+
+<div class="table">
+    <h1>Moulding Phase</h1>
+    <ul>
+        {{#each pdata}}
+        <li>Machine: {{@key}}
+            <ol>
+                {{#each this}}
+                <li class="{{this.OK}}">OK: {{this.OK}} - temperature: {{this.temp}} - rpm: {{this.rpm}}</li>
+                {{/each}}
+            </ol>
+        </li>
+        {{/each}}
+    </ul>
+</div>
+
+
+<div class="table">
+    <h1>Cooling Phase</h1>
+    <ul>
+        {{#each cdata}}
+        <li>Machine: {{@key}}
+            <ol>
+                {{#each this}}
+                <li class="{{this.OK}}">OK: {{this.OK}} - cooling: {{this.cooling}}</li>
+                {{/each}}
+            </ol>
+        </li>
+        {{/each}}
+    </ul>
+</div>
