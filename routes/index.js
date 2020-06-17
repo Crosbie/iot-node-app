@@ -10,7 +10,7 @@ var minCooling = 18;
 var maxCooling = 22;
 
 var coolingData = {};
-var prodData = {}
+var prodData = {};
 
 
 function evalutateProduction(ip,data,cb){
